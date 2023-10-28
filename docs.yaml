@@ -1,0 +1,174 @@
+openapi: '3.0.2'
+info:
+  title: Golden Marc API
+  version: '1.0'
+servers:
+  - url: http://localhost:4000  
+paths:
+  /auth/create-user:
+    post:
+      tags: 
+        - Autenticacion
+      summary: Registrar usuarios
+      requestBody:
+        description: Crea un usuario, regresando la informacion del mismo junto con el token.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstname:
+                  type: string
+                lastname:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+                key_office:
+                  type: string
+      responses:
+        '200':
+          description: Creacion de usuario correcta.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithToken'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: No existe el usuario.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/login:
+    post:
+      tags: 
+        - Autenticacion
+      summary: Inicio de sesion
+      requestBody:
+        description: Inicia sesion, y crea un token.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Inicio de sesion correcto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithToken'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '403':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: No existe el usuario.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/renew-token:
+    get:
+      tags: 
+        - Autenticacion
+      summary: Obtiene la informacion del usuario y retorna un nuevo token.
+      security: 
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Renovacion de token correcta
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithToken'
+        '400':
+          description: Hubo un error al validar el token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    UserWithToken:
+      type: object
+      properties:
+        id:
+          type: number
+        firstName:
+          type: string
+        lastName:
+          type: string
+        userName:
+          type: string
+        role:
+          type: number
+        key_office:
+          type: number
+        token:
+          type: string
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+              attribute:
+                type: array
+                items:
+                  type: string
+    Error: 
+      type: object
+      properties:
+        error: 
+          type: string
+  securitySchemes:
+    bearerAuth:            
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    

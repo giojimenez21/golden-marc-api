@@ -9,7 +9,9 @@ export const db = new Sequelize(
         port: process.env.PORT_DB as number | undefined,
         dialect: "mysql",
         define: {
-            timestamps: true
+            timestamps: true,
+            createdAt: "created_at",
+            updatedAt: "updated_at"
         },
         logging: true
     }

@@ -1,19 +1,19 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { db } from "../../common";
 
-interface UserAttributes {
-    id: number;
+export interface UserModel {
+    id?: number;
     firstname: string;
     lastname: string;
     username: string;
-    password: string;
+    password?: string;
     role: string;
     key_office: string;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, "id"> {}
+interface UserCreationAttributes extends Optional<UserModel, "id"> {}
 
-export const User = db.define<Model<UserAttributes, UserCreationAttributes>>(
+export const User = db.define<Model<UserModel, UserCreationAttributes>>(
     "users",
     {
         id: {
@@ -38,6 +38,6 @@ export const User = db.define<Model<UserAttributes, UserCreationAttributes>>(
         },
         key_office: {
             type: DataTypes.STRING,
-        },
+        }
     }
 );
