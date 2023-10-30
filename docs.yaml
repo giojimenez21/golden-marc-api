@@ -128,7 +128,80 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  /managment/create-office:
+    post:
+      tags: 
+        - Gestion 
+      summary: Crear oficina
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Crea una oficina.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key_office:
+                  type: string
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Creacion de oficina correcta.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithToken'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /managment/find-all-offices:
+    get:
+      tags: 
+        - Gestion 
+      summary: Listar todas las oficinas.
+      security:
+        - bearerAuth: []
+      parameters: 
+        - in: query
+          name: page 
+          schema: 
+            type: number 
+          description: Numero de pagina 
+        - in: query
+          name: size
+          schema: 
+            type: number 
+          description: Tamaño de la pagina
+      responses:
+        '200':
+          description: Listado de oficinas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithToken'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     UserWithToken:
@@ -167,6 +240,33 @@ components:
       properties:
         error: 
           type: string
+    Office:
+      type: object
+      properties:
+        id:
+          type: number
+        key_office:
+          type: string
+        name:
+          type: string
+    Pagination: 
+      type: object
+      properties:
+        currentPage:
+          type: number 
+        nextPage: 
+          type: number
+        previousPage:
+          type: number
+        totalPages: 
+          type: number
+    OfficePage:
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - type: object
+          properties:
+            offices:
+              $ref: "#/components/schemas/Office"
   securitySchemes:
     bearerAuth:            
       type: http
