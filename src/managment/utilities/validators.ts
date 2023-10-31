@@ -7,3 +7,9 @@ export const createOfficeSchema = Joi.object({
     name: Joi.string()
         .required()
 });
+
+export const createPlaceSchema = Joi.object({
+    name: Joi.string()
+        .min(3)
+        .required()
+});

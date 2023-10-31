@@ -15,9 +15,11 @@ export const Place = db.define<Model<PlaceModel, PlaceCreationAttributes>>(
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
+            allowNull: false
         },
         name: {
             type: DataTypes.STRING,
+            allowNull: false
         },
     }
 );

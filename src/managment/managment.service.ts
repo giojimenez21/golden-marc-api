@@ -1,9 +1,11 @@
+import { Op } from "sequelize";
 import { calculateOffset, calculatePagination } from "../common/helpers/calculatePagination";
 import { ErrorAndCode } from "../common/utilities/ErrorAndCode";
 import { IManagmentService } from "./interface/IManagmentService";
 import { OfficePage } from "./interface/OfficePage";
+import { PlacePage } from "./interface/PlacePage";
 import { Office, OfficeModel } from "./models/Office.model";
-import { PlaceModel } from "./models/Place.model";
+import { Place, PlaceModel } from "./models/Place.model";
 
 export class ManagmentService implements IManagmentService {
     async findAllOffice(pageNumber: number, pageSize: number): Promise<OfficePage> {
@@ -53,14 +55,47 @@ export class ManagmentService implements IManagmentService {
         return newOffice.toJSON();
     }
 
-    createPlace(place: PlaceModel): Promise<PlaceModel> {
-        throw new Error("Method not implemented.");
+    async createPlace(place: PlaceModel): Promise<PlaceModel> {
+        const placeCreated = await Place.create(place);
+        return placeCreated.toJSON();
     }
 
-    findAllPlaces(): Promise<PlaceModel[]> {
-        throw new Error("Method not implemented.");
+    async findAllPlaces(pageNumber: number, pageSize: number): Promise<PlacePage> {
+        const offset = calculateOffset(pageNumber, pageSize);
+        const places = await Place.findAndCountAll({
+            offset,
+            limit: pageSize
+        });
+        const placesJson = places.rows.map((place) => place.toJSON());
+        const pagination = calculatePagination(pageNumber, pageSize, places.count);
+        const placesWithPagination: PlacePage = {
+            ...pagination,
+            places: placesJson,
+        }
+        return placesWithPagination;
     }
-    findPlace(id: number, name: string): Promise<OfficeModel> {
-        throw new Error("Method not implemented.");
+
+
+    async findPlace(id: number = 0, name: string = ""): Promise<PlaceModel> {
+        let placeFind;
+        if(id > 0) {
+            placeFind = await Place.findOne({
+                where: {
+                    id
+                }
+            });
+        }
+
+        if(name !== "") {
+            placeFind = await Place.findOne({
+                where: {
+                    name: {
+                        [Op.substring]: name
+                    }
+                }
+            });
+        }
+
+        return placeFind?.toJSON() as PlaceModel;
     }
 }

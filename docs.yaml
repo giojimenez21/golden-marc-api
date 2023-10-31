@@ -189,7 +189,123 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserWithToken'
+                $ref: '#/components/schemas/OfficePage'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /managment/find-office:
+    get:
+      tags: 
+        - Gestion 
+      summary: Encontrar una oficina o sucursal.
+      security:
+        - bearerAuth: []
+      parameters: 
+        - in: query
+          name: id 
+          schema: 
+            type: number 
+          description: Id de la oficina
+        - in: query
+          name: keyOffice
+          schema: 
+            type: number 
+          description: Clave de la oficina
+        - in: query
+          name: name 
+          schema:
+            type: string 
+          description: Nombre de la oficina
+      responses:
+        '200':
+          description: Listado de oficinas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Office'
+        '204':
+          description: No se encontro ninguna oficina o sucursal.
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /managment/find-all-places:
+    get:
+      tags: 
+        - Gestion 
+      summary: Listar todos los lugares donde se puede viajar.
+      security:
+        - bearerAuth: []
+      parameters: 
+        - in: query
+          name: page 
+          schema: 
+            type: number 
+          description: Numero de pagina 
+        - in: query
+          name: size
+          schema: 
+            type: number 
+          description: Tamaño de la pagina
+      responses:
+        '200':
+          description: Listado de lugares
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlacePage'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /managment/create-place:
+    post:
+      tags: 
+        - Gestion 
+      summary: Crea un nuevo destino para viajar.
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Crea un nuevo destino para viajar.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Retorna el nuevo objeto del destino.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Place'
         '400':
           description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
           content:
@@ -267,6 +383,20 @@ components:
           properties:
             offices:
               $ref: "#/components/schemas/Office"
+    Place:
+      type: object
+      properties:
+        id: 
+          type: number
+        name: 
+          type: string
+    PlacePage:
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - type: object
+          properties:
+            places:
+              $ref: "#/components/schemas/Place"
   securitySchemes:
     bearerAuth:            
       type: http

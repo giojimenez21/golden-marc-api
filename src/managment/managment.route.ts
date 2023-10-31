@@ -5,6 +5,7 @@ import { validateRoles } from "../auth/middleware/validateRoles";
 import { verifyToken } from "../auth/middleware/verifyToken";
 import { validateRequest } from "../common";
 import { createOfficeSchema } from "./utilities/validators";
+import { Role } from "../auth/interface/Role.enum";
 
 export const managmentRoute = Router();
 
@@ -16,11 +17,27 @@ managmentRoute.use(verifyToken);
 managmentRoute.post(
     "/create-office",
     validateRequest(createOfficeSchema),
-    validateRoles(["ADMIN"]), 
+    validateRoles([Role.ADMIN]), 
     managmentController.createOffice
 );
 
 managmentRoute.get(
     "/find-all-offices",
     managmentController.findAllOffice
-)
+);
+
+managmentRoute.get(
+    "/find-office",
+    managmentController.findOffice
+);
+
+managmentRoute.get(
+    "/find-all-places",
+    managmentController.findAllPlaces
+);
+
+managmentRoute.post(
+    "/create-place",
+    validateRoles([Role.ADMIN]),
+    managmentController.createPlace
+);
