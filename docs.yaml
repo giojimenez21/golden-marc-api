@@ -318,6 +318,88 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /managment/find-place:
+    get:
+      tags: 
+        - Gestion 
+      summary: Encontrar una destino o lugar.
+      security:
+        - bearerAuth: []
+      parameters: 
+        - in: query
+          name: id 
+          schema: 
+            type: number 
+          description: Id del destino o lugar
+        - in: query
+          name: name
+          schema: 
+            type: string 
+          description: Nombre del destino o lugar
+      responses:
+        '200':
+          description: Destino encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Place'
+        '204':
+          description: No se encontro ninguna oficina o sucursal.
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /managment/create-travel:
+    post:
+      tags: 
+        - Gestion 
+      summary: Crea un nuevo viaje.
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Crea un nuevo viaje.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                places_start_id:
+                  type: number
+                places_end_id:
+                  type: number
+                number_seats:
+                  type: number
+                price_ticket:
+                  type: number 
+                date:
+                  type: string
+      responses:
+        '200':
+          description: Retorna el nuevo objeto del viaje.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Travel'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     UserWithToken:
@@ -338,19 +420,16 @@ components:
         token:
           type: string
     ValidationError:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: object
-            properties:
-              message:
-                type: string
-              attribute:
-                type: array
-                items:
-                  type: string
+      type: array
+      items:
+        type: object
+        properties:
+          message:
+            type: string
+          attribute:
+            type: array
+            items:
+              type: string
     Error: 
       type: object
       properties:
@@ -397,6 +476,21 @@ components:
           properties:
             places:
               $ref: "#/components/schemas/Place"
+    Travel:
+      type: object
+      properties:
+        id: 
+          type: number
+        places_start_id:
+          type: number
+        places_end_id: 
+          type: number
+        number_seats:
+          type: number
+        price_ticket:
+          type: number
+        date: 
+          type: string
   securitySchemes:
     bearerAuth:            
       type: http

@@ -80,4 +80,35 @@ export class ManagmentController  {
             return res.status(500).json({ error: e.message });
         }
     }
+
+    public findPlace = async(req: Request, res: Response) => {
+        const placeId = +req.query.id!;
+        const placeName = req.query.name as string;
+        try {
+            const place = await this.managmentService.findPlace(placeId, placeName);
+            if(!place) {
+                return res.status(204).json(place);
+            }
+            return res.status(200).json(place);
+        } catch (e: any) {
+            logger.error(e.stack);
+            if (e instanceof ErrorAndCode) {
+                return res.status(e.statusCode).json({ error: e.message });
+            }
+            return res.status(500).json({ error: e.message });
+        }
+    }
+
+    public createTravel = async(req: Request, res: Response) => {
+        try {
+            const travelCreated = await this.managmentService.createTravel(req.body);
+            return res.status(201).json(travelCreated);
+        } catch (e: any) {
+            logger.error(e.stack);
+            if (e instanceof ErrorAndCode) {
+                return res.status(e.statusCode).json({ error: e.message });
+            }
+            return res.status(500).json({ error: e.message });
+        }
+    }
 }

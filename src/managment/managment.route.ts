@@ -4,7 +4,7 @@ import { ManagmentController } from "./managment.controller";
 import { validateRoles } from "../auth/middleware/validateRoles";
 import { verifyToken } from "../auth/middleware/verifyToken";
 import { validateRequest } from "../common";
-import { createOfficeSchema } from "./utilities/validators";
+import { createOfficeSchema, createTravelSchema } from "./utilities/validators";
 import { Role } from "../auth/interface/Role.enum";
 
 export const managmentRoute = Router();
@@ -40,4 +40,16 @@ managmentRoute.post(
     "/create-place",
     validateRoles([Role.ADMIN]),
     managmentController.createPlace
+);
+
+managmentRoute.get(
+    "/find-place",
+    managmentController.findPlace
+);
+
+managmentRoute.post(
+    "/create-travel",
+    validateRequest(createTravelSchema),
+    validateRoles([Role.ADMIN]),
+    managmentController.createTravel
 );

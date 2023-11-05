@@ -6,6 +6,8 @@ import { OfficePage } from "./interface/OfficePage";
 import { PlacePage } from "./interface/PlacePage";
 import { Office, OfficeModel } from "./models/Office.model";
 import { Place, PlaceModel } from "./models/Place.model";
+import { Travel, TravelModel } from "./models/Travel.model";
+import { logger } from "../common";
 
 export class ManagmentService implements IManagmentService {
     async findAllOffice(pageNumber: number, pageSize: number): Promise<OfficePage> {
@@ -39,7 +41,11 @@ export class ManagmentService implements IManagmentService {
 
         if(name !== "") {
             office = await Office.findOne({
-                where: { name }
+                where: { 
+                    name: {
+                        [Op.substring]: name
+                    }
+                }
             });
         }
 
@@ -97,5 +103,33 @@ export class ManagmentService implements IManagmentService {
         }
 
         return placeFind?.toJSON() as PlaceModel;
+    }
+
+    async createTravel(travel: TravelModel): Promise<TravelModel> {
+        logger.debug(JSON.stringify(travel));
+        const travelExist = await this.findTravel(
+            travel.places_start_id, 
+            travel.places_end_id, 
+            travel.date
+        );
+
+        if(travelExist) {
+            throw new ErrorAndCode(400, "Ya existe un viaje asignado con esos datos");
+        }
+
+        const travelNew = await Travel.create(travel);
+        return travelNew.toJSON();
+    }
+
+    async findTravel(placeStart: number, placeEnd: number, date: Date): Promise<TravelModel> {
+        const travel = await Travel.findOne({
+            where: {
+                places_start_id: placeStart,
+                places_end_id: placeEnd,
+                date
+            }
+        });
+
+        return travel?.toJSON() as TravelModel;
     }
 }
