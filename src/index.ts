@@ -11,6 +11,7 @@ import swaggerUI from "swagger-ui-express";
 import { db, logger } from "./common";
 import { authRouter } from "./auth/auth.route";
 import { managmentRoute } from "./managment/managment.route";
+import { SocketWithUser, verifyTokenSocket } from "./auth/middleware/verifyTokenSocket";
 
 const app = express();
 const server = createServer(app);
@@ -29,8 +30,10 @@ db.authenticate()
     .then(() => logger.info("DB online"))
     .catch((e) => logger.error(`DB error: ${e.message}`));
 
-io.on("connection", (socket) => {
-    logger.debug("Socket connected");
+io.use((socket, next) => verifyTokenSocket(socket, next));
+
+io.on("connection", (socket: SocketWithUser) => {
+    logger.debug(`User connected: ${socket.user?.username}`);
 });
 
 server.listen(PORT, () => logger.info(`Listening on port ${PORT}`));
