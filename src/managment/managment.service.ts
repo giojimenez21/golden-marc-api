@@ -8,6 +8,7 @@ import { Office, OfficeModel } from "./models/Office.model";
 import { Place, PlaceModel } from "./models/Place.model";
 import { Travel, TravelModel } from "./models/Travel.model";
 import { logger } from "../common";
+import { Ticket, TicketModel } from "./models/Ticket.model";
 
 export class ManagmentService implements IManagmentService {
     async findAllOffice(pageNumber: number, pageSize: number): Promise<OfficePage> {
@@ -100,7 +101,7 @@ export class ManagmentService implements IManagmentService {
                     }
                 }
             });
-        }
+        } 
 
         return placeFind?.toJSON() as PlaceModel;
     }
@@ -131,5 +132,27 @@ export class ManagmentService implements IManagmentService {
         });
 
         return travel?.toJSON() as TravelModel;
+    }
+
+    async findTicket(keyTicket: string): Promise<TicketModel> {
+        const ticket = await Ticket.findOne({
+            where: { key_ticket: keyTicket },
+            include: [
+                {
+                    model: Office
+                },
+                {
+                    model: Travel
+                }
+            ]
+        });
+
+        return ticket?.toJSON() as TicketModel;
+    }
+
+
+    async createTicket(ticket: TicketModel): Promise<TicketModel> {
+        const newTicket = await Ticket.create(ticket);
+        return newTicket.toJSON();
     }
 }

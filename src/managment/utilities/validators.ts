@@ -32,3 +32,18 @@ export const createTravelSchema = Joi.object({
         .min(1)
         .required()
 });
+
+export const createTicketSchema = Joi.object({
+    price: Joi.number()
+        .min(1)
+        .required(),
+    key_ofiice: Joi.string()
+        .required(),
+    name_client: Joi.string()
+        .required(),
+    number_seat: Joi.number()
+        .min(1)
+        .required(),
+    travels_id: Joi.string()
+        .required()
+});

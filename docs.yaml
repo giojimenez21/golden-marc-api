@@ -400,6 +400,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /managment/create-ticket:
+    post:
+      tags: 
+        - Gestion 
+      summary: Crea un nuevo ticket, cuando el cliente compra un boleto.
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Crea un nuevo ticket, cuando el cliente compra un boleto.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: number
+                key_office:
+                  type: string
+                name_client: 
+                  type: string
+                number_seat:
+                  type: number 
+                travels_id:
+                  type: string
+      responses:
+        '200':
+          description: Retorna el nuevo objeto del ticket/boleto.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     UserWithToken:
@@ -419,6 +462,21 @@ components:
           type: number
         token:
           type: string
+    Ticket:
+      type: object
+      properties:
+        id:
+          type: number
+        key_ticket:
+          type: string
+        price:
+          type: number
+        name_client:
+          type: string
+        number_seat:
+          type: number
+        travels_id:
+          type: number
     ValidationError:
       type: array
       items:

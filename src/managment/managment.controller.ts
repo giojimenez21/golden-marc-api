@@ -111,4 +111,33 @@ export class ManagmentController  {
             return res.status(500).json({ error: e.message });
         }
     }
+
+    public createTicket = async(req: Request, res: Response) => {
+        try {
+            const ticketCreated = await this.managmentService.createTicket(req.body);
+            return res.status(201).json(ticketCreated);
+        } catch (e: any) {
+            logger.error(e.stack);
+            if (e instanceof ErrorAndCode) {
+                return res.status(e.statusCode).json({ error: e.message });
+            }
+            return res.status(500).json({ error: e.message });
+        }
+    }
+
+    public findTicket = async(req: Request, res: Response) => {
+        try {
+            const ticketFound = await this.managmentService.findTicket(req.params.keyTicket);
+            if(!ticketFound) {
+                return res.status(204).json(ticketFound)
+            }
+            return res.status(200).json(ticketFound);
+        } catch (e: any) {
+            logger.error(e.stack);
+            if (e instanceof ErrorAndCode) {
+                return res.status(e.statusCode).json({ error: e.message });
+            }
+            return res.status(500).json({ error: e.message });
+        }
+    }
 }

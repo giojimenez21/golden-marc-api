@@ -4,7 +4,7 @@ import { ManagmentController } from "./managment.controller";
 import { validateRoles } from "../auth/middleware/validateRoles";
 import { verifyToken } from "../auth/middleware/verifyToken";
 import { validateRequest } from "../common";
-import { createOfficeSchema, createTravelSchema } from "./utilities/validators";
+import { createOfficeSchema, createTicketSchema, createTravelSchema } from "./utilities/validators";
 import { Role } from "../auth/interface/Role.enum";
 
 export const managmentRoute = Router();
@@ -52,4 +52,10 @@ managmentRoute.post(
     validateRequest(createTravelSchema),
     validateRoles([Role.ADMIN]),
     managmentController.createTravel
+);
+
+managmentRoute.post(
+    "/create-ticket",
+    validateRequest(createTicketSchema),
+    managmentController.createTicket
 );
