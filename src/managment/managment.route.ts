@@ -59,3 +59,8 @@ managmentRoute.post(
     validateRequest(createTicketSchema),
     managmentController.createTicket
 );
+
+managmentRoute.get(
+    "/find-travels",
+    managmentController.findTravels
+);

@@ -4,6 +4,7 @@ import { TicketModel } from "../models/Ticket.model";
 import { TravelModel } from "../models/Travel.model";
 import { OfficePage } from "./OfficePage";
 import { PlacePage } from "./PlacePage";
+import { TravelPage } from "./TravelPage";
 
 export interface IManagmentService {
     createOffice(office: OfficeModel): Promise<OfficeModel>;
@@ -16,4 +17,5 @@ export interface IManagmentService {
     findTravel(placeStart: number, placeEnd: number, date: Date): Promise<TravelModel>;
     findTicket(keyTicket: string): Promise<TicketModel>;
     createTicket(ticket: TicketModel): Promise<TicketModel>;
+    findTravels(placeStart: number, placeEnd: number, date: string, pageNumber: number, pageSize: number): Promise<TravelPage>;
 }

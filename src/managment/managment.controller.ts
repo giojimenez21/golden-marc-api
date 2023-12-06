@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { IManagmentService } from "./interface/IManagmentService";
 import { logger } from "../common";
 import { ErrorAndCode } from "../common/utilities/ErrorAndCode";
+import { PageDefaults } from "../common/interface/PageDefaults.enum";
 
 export class ManagmentController  {
     constructor(private readonly managmentService: IManagmentService) {}
@@ -20,8 +21,8 @@ export class ManagmentController  {
     }
 
     public findAllOffice = async(req: Request, res: Response) => {
-        const pageNumber = +req.query.page! || 1;
-        const pageSize = +req.query.size! || +process.env.PAGE_SIZE!;
+        const pageNumber = +req.query.page! || PageDefaults.pageNumber;
+        const pageSize = +req.query.size! || PageDefaults.pageSize;
         try {
             const officeCreated = await this.managmentService.findAllOffice(pageNumber, pageSize);
             return res.status(200).json(officeCreated);
@@ -54,8 +55,8 @@ export class ManagmentController  {
     }
 
     public findAllPlaces = async(req: Request, res: Response) => {
-        const pageNumber = +req.query.page! || 1;
-        const pageSize = +req.query.size! || +process.env.PAGE_SIZE!;
+        const pageNumber = +req.query.page! || PageDefaults.pageNumber;
+        const pageSize = +req.query.size! || PageDefaults.pageSize;
         try {
             const places = await this.managmentService.findAllPlaces(pageNumber, pageSize);
             return res.status(200).json(places);
@@ -132,6 +133,33 @@ export class ManagmentController  {
                 return res.status(204).json(ticketFound)
             }
             return res.status(200).json(ticketFound);
+        } catch (e: any) {
+            logger.error(e.stack);
+            if (e instanceof ErrorAndCode) {
+                return res.status(e.statusCode).json({ error: e.message });
+            }
+            return res.status(500).json({ error: e.message });
+        }
+    }
+
+    public findTravels = async(req: Request, res: Response) => {
+        const { placeStart = 0, placeEnd = 0, date = "" } = req.query!;
+        const pageNumber = +req.query.page! || PageDefaults.pageNumber;
+        const pageSize = +req.query.size! || PageDefaults.pageSize;
+        logger.debug(pageNumber + pageSize);
+        try {
+            const travelPage = await this.managmentService.findTravels(
+                +placeStart!,
+                +placeEnd!,
+                date?.toString()!,
+                pageNumber,
+                pageSize
+            );
+
+            if(travelPage.travels.length == 0) {
+                return res.status(204).json(travelPage);
+            }
+            return res.status(200).json(travelPage);
         } catch (e: any) {
             logger.error(e.stack);
             if (e instanceof ErrorAndCode) {

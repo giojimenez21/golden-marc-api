@@ -9,6 +9,7 @@ import { Place, PlaceModel } from "./models/Place.model";
 import { Travel, TravelModel } from "./models/Travel.model";
 import { logger } from "../common";
 import { Ticket, TicketModel } from "./models/Ticket.model";
+import { TravelPage } from "./interface/TravelPage";
 
 export class ManagmentService implements IManagmentService {
     async findAllOffice(pageNumber: number, pageSize: number): Promise<OfficePage> {
@@ -87,18 +88,14 @@ export class ManagmentService implements IManagmentService {
         let placeFind;
         if(id > 0) {
             placeFind = await Place.findOne({
-                where: {
-                    id
-                }
+                where: { id }
             });
         }
 
         if(name !== "") {
             placeFind = await Place.findOne({
                 where: {
-                    name: {
-                        [Op.substring]: name
-                    }
+                    name: { [Op.substring]: name }
                 }
             });
         } 
@@ -138,21 +135,43 @@ export class ManagmentService implements IManagmentService {
         const ticket = await Ticket.findOne({
             where: { key_ticket: keyTicket },
             include: [
-                {
-                    model: Office
-                },
-                {
-                    model: Travel
-                }
+                { model: Office },
+                { model: Travel }
             ]
         });
 
         return ticket?.toJSON() as TicketModel;
     }
 
-
     async createTicket(ticket: TicketModel): Promise<TicketModel> {
         const newTicket = await Ticket.create(ticket);
         return newTicket.toJSON();
+    }
+
+    async findTravels(
+        placeStart: number, 
+        placeEnd: number, 
+        date: string, 
+        pageNumber: number, 
+        pageSize: number
+    ): Promise<TravelPage> {
+        const offset = calculateOffset(pageNumber, pageSize);
+        const travels = await Travel.findAndCountAll({
+            offset,
+            limit: pageSize,
+            where: {
+                [Op.or]: [
+                    { places_start_id: placeStart }, 
+                    { places_end_id: placeEnd },
+                    { date }
+                ]
+            }
+        });
+        const pagination = calculatePagination(pageNumber, pageSize, travels.count);
+        const travelsWithPagination: TravelPage = {
+            ...pagination,
+            travels: travels.rows.map(travel => travel.toJSON())
+        }
+        return travelsWithPagination;
     }
 }

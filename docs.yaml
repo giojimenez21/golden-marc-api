@@ -424,13 +424,46 @@ paths:
                   type: number 
                 travels_id:
                   type: string
+  /managment/find-travels:
+    get:
+      tags: 
+        - Gestion 
+      summary: Busca los viajes por lugar de inicio, lugar de destino y fecha.
+      security:
+        - bearerAuth: []
+      parameters: 
+        - in: query
+          name: placeStart 
+          schema: 
+            type: number 
+          description: Id de lugar de inicio
+        - in: query
+          name: placeEnd
+          schema: 
+            type: string 
+          description: Id del lugar de destino
+        - in: query
+          name: date
+          schema: 
+            type: string 
+          description: Fecha de inicio del viaje en formato "yyyy-mm-dd"
+        - in: query
+          name: page
+          schema: 
+            type: string 
+          description: Numero de la pagina del resultado, por default es 1
+        - in: query
+          name: size
+          schema: 
+            type: string 
+          description: Numero de elementos a mostrar por pagina, el default es el que fue especificado en el .env
       responses:
         '200':
-          description: Retorna el nuevo objeto del ticket/boleto.
+          description: Retorna el listado de viajes que coinciden
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Ticket'
+                $ref: '#/components/schemas/TravelPage'
         '400':
           description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
           content:
@@ -549,6 +582,13 @@ components:
           type: number
         date: 
           type: string
+    TravelPage:
+      allOf:
+        - $ref: "#/components/schemas/Pagination"
+        - type: object
+          properties:
+            travels:
+              $ref: "#/components/schemas/Travel"
   securitySchemes:
     bearerAuth:            
       type: http
