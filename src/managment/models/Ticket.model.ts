@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { DataTypes, Model, Optional } from "sequelize";
 import { db } from "../../common";
 import { Office } from "./Office.model";
@@ -24,7 +25,8 @@ export const Ticket = db.define<Model<TicketModel, TicketCreationAttributes>>(
             primaryKey: true,
         },
         key_ticket : {
-            type: DataTypes.STRING,
+            type: DataTypes.UUID,
+            defaultValue: () => uuidv4()
         },
         price: {
             type: DataTypes.FLOAT,

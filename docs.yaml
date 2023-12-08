@@ -423,7 +423,26 @@ paths:
                 number_seat:
                   type: number 
                 travels_id:
-                  type: string
+                  type: number
+      responses:
+        '200':
+          description: Retorna el nuevo ticket(boleto)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /managment/find-travels:
     get:
       tags: 

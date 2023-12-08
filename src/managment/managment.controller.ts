@@ -3,6 +3,7 @@ import { IManagmentService } from "./interface/IManagmentService";
 import { logger } from "../common";
 import { ErrorAndCode } from "../common/utilities/ErrorAndCode";
 import { PageDefaults } from "../common/interface/PageDefaults.enum";
+import dayjs from "dayjs";
 
 export class ManagmentController  {
     constructor(private readonly managmentService: IManagmentService) {}
@@ -115,6 +116,13 @@ export class ManagmentController  {
 
     public createTicket = async(req: Request, res: Response) => {
         try {
+            const travel = await this.managmentService.findTravelById(req.body.travels_id);
+            logger.debug(travel);
+            const dateOfTravel = dayjs(travel.date);
+            if(dateOfTravel.isBefore (dayjs())) {
+                return res.status(400).json({ error: "No puede seleccionar un viaje que ya fue realizado." });
+            }
+
             const ticketCreated = await this.managmentService.createTicket(req.body);
             return res.status(201).json(ticketCreated);
         } catch (e: any) {
@@ -143,10 +151,10 @@ export class ManagmentController  {
     }
 
     public findTravels = async(req: Request, res: Response) => {
-        const { placeStart = 0, placeEnd = 0, date = "" } = req.query!;
+        const { placeStart, placeEnd, date } = req.query!;
         const pageNumber = +req.query.page! || PageDefaults.pageNumber;
         const pageSize = +req.query.size! || PageDefaults.pageSize;
-        logger.debug(pageNumber + pageSize);
+        
         try {
             const travelPage = await this.managmentService.findTravels(
                 +placeStart!,

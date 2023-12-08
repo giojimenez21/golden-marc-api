@@ -37,13 +37,13 @@ export const createTicketSchema = Joi.object({
     price: Joi.number()
         .min(1)
         .required(),
-    key_ofiice: Joi.string()
+    key_office: Joi.string()
         .required(),
     name_client: Joi.string()
         .required(),
     number_seat: Joi.number()
         .min(1)
         .required(),
-    travels_id: Joi.string()
+    travels_id: Joi.number()
         .required()
 });

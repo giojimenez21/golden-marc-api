@@ -18,4 +18,5 @@ export interface IManagmentService {
     findTicket(keyTicket: string): Promise<TicketModel>;
     createTicket(ticket: TicketModel): Promise<TicketModel>;
     findTravels(placeStart: number, placeEnd: number, date: string, pageNumber: number, pageSize: number): Promise<TravelPage>;
+    findTravelById(id: number): Promise<TravelModel>;
 }

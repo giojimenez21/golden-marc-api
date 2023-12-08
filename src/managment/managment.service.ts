@@ -131,6 +131,11 @@ export class ManagmentService implements IManagmentService {
         return travel?.toJSON() as TravelModel;
     }
 
+    async findTravelById(id: number): Promise<TravelModel> {
+        const travel = await Travel.findOne({ where:{ id } });
+        return travel?.toJSON() as TravelModel;
+    }
+
     async findTicket(keyTicket: string): Promise<TicketModel> {
         const ticket = await Ticket.findOne({
             where: { key_ticket: keyTicket },
@@ -149,22 +154,32 @@ export class ManagmentService implements IManagmentService {
     }
 
     async findTravels(
-        placeStart: number, 
-        placeEnd: number, 
-        date: string, 
+        placeStart: number | null, 
+        placeEnd: number | null, 
+        date: string | null, 
         pageNumber: number, 
         pageSize: number
     ): Promise<TravelPage> {
         const offset = calculateOffset(pageNumber, pageSize);
+        const whereClause:any = {};
+
+        if (placeStart) {
+            whereClause.places_start_id = placeStart;
+        }
+    
+        if (placeEnd) {
+            whereClause.places_end_id = placeEnd;
+        }
+    
+        if (date) {
+            whereClause.date = date;
+        }
+
         const travels = await Travel.findAndCountAll({
             offset,
             limit: pageSize,
             where: {
-                [Op.or]: [
-                    { places_start_id: placeStart }, 
-                    { places_end_id: placeEnd },
-                    { date }
-                ]
+                [Op.or]: whereClause
             }
         });
         const pagination = calculatePagination(pageNumber, pageSize, travels.count);
