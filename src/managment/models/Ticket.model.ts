@@ -24,7 +24,7 @@ export const Ticket = db.define<Model<TicketModel, TicketCreationAttributes>>(
             autoIncrement: true,
             primaryKey: true,
         },
-        key_ticket : {
+        key_ticket: {
             type: DataTypes.UUID,
             defaultValue: () => uuidv4()
         },
@@ -49,7 +49,8 @@ export const Ticket = db.define<Model<TicketModel, TicketCreationAttributes>>(
     }
 );
 
-Office.hasMany(Ticket);
+Office.hasMany(Ticket, { foreignKey: "key_office" });
 Ticket.belongsTo(Office, { foreignKey: "key_office" });
-Travel.hasMany(Ticket);
+
+Travel.hasMany(Ticket, { foreignKey: "travels_id" });
 Ticket.belongsTo(Travel, { foreignKey: "travels_id" });

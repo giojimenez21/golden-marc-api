@@ -118,9 +118,13 @@ export class ManagmentController  {
         try {
             const travel = await this.managmentService.findTravelById(req.body.travels_id);
             logger.debug(travel);
-            const dateOfTravel = dayjs(travel.date);
-            if(dateOfTravel.isBefore (dayjs())) {
+            
+            if(this.managmentService.isDateValidForSale(travel.date)) {
                 return res.status(400).json({ error: "No puede seleccionar un viaje que ya fue realizado." });
+            }
+
+            if(await this.managmentService.findTicketBySeat(+req.body.number_seat, +req.body.travels_id)) {
+                return res.status(400).json({ error: "El asiento ya se encuentra ocupado." });
             }
 
             const ticketCreated = await this.managmentService.createTicket(req.body);

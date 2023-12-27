@@ -19,4 +19,7 @@ export interface IManagmentService {
     createTicket(ticket: TicketModel): Promise<TicketModel>;
     findTravels(placeStart: number, placeEnd: number, date: string, pageNumber: number, pageSize: number): Promise<TravelPage>;
     findTravelById(id: number): Promise<TravelModel>;
+    findSeatsNoAvailableByTravel(idTravel: number): Promise<TicketModel[]>;
+    isDateValidForSale(date: Date): boolean;
+    findTicketBySeat(numberSeat: number, idTravel: number): Promise<TicketModel>;
 }

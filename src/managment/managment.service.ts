@@ -10,6 +10,7 @@ import { Travel, TravelModel } from "./models/Travel.model";
 import { logger } from "../common";
 import { Ticket, TicketModel } from "./models/Ticket.model";
 import { TravelPage } from "./interface/TravelPage";
+import dayjs from "dayjs";
 
 export class ManagmentService implements IManagmentService {
     async findAllOffice(pageNumber: number, pageSize: number): Promise<OfficePage> {
@@ -188,5 +189,27 @@ export class ManagmentService implements IManagmentService {
             travels: travels.rows.map(travel => travel.toJSON())
         }
         return travelsWithPagination;
+    }
+
+    async findSeatsNoAvailableByTravel(idTravel: number): Promise<TicketModel[]> {
+        const seats = await Ticket.findAll({
+            attributes: ["number_seat"],
+            where: { travels_id: idTravel }
+        });
+
+        return seats.map(seat => seat.toJSON());
+    }
+
+    isDateValidForSale(date: Date): boolean {
+        const dateOfTravel = dayjs(date);
+        return dateOfTravel.isAfter(dayjs());
+    }
+
+    async findTicketBySeat(numberSeat: number, idTravel: number): Promise<TicketModel> {
+        const seat = await Ticket.findOne({ 
+            where:  { number_seat: numberSeat, travels_id: idTravel }
+        });
+
+        return seat?.toJSON() as TicketModel;
     }
 }

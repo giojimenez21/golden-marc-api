@@ -443,6 +443,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /managment/find-ticket/{keyTicket}:
+    get:
+      tags: 
+        - Gestion 
+      summary: Encuentra la informacion de un ticket
+      security:
+        - bearerAuth: []
+      parameters: 
+        - in: path
+          name: keyTicket 
+          required: true
+          schema: 
+            type: string 
+          description: Clave del ticket
+      responses:
+        '200':
+          description: Ticket encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /managment/find-travels:
     get:
       tags: 

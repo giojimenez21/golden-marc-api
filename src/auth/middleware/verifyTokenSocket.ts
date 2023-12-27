@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { Socket } from "socket.io";
 import { ExtendedError } from "socket.io/dist/namespace";
 import { TokenError, TokenPayloadDecoded } from "../interface/Token";
+import { logger } from "../../common";
 
 export interface SocketWithUser extends Socket {
     user?: TokenPayloadDecoded
@@ -9,6 +10,7 @@ export interface SocketWithUser extends Socket {
 
 export const verifyTokenSocket = (socket: SocketWithUser, next: (err?: ExtendedError | undefined) => void) => {
     const token = socket.handshake.headers.access_token as string;
+    logger.debug(token);
     try {
         const userDecoded = jwt.verify(token, process.env.SECRET_JWT!) as TokenPayloadDecoded;
         socket.user = userDecoded;
