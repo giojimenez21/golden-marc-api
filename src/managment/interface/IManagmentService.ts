@@ -4,6 +4,8 @@ import { TicketModel } from "../models/Ticket.model";
 import { TravelModel } from "../models/Travel.model";
 import { OfficePage } from "./OfficePage";
 import { PlacePage } from "./PlacePage";
+import { TicketPage } from "./TicketPage";
+import { TicketSearch } from "./TicketSearch";
 import { TravelPage } from "./TravelPage";
 
 export interface IManagmentService {
@@ -22,4 +24,5 @@ export interface IManagmentService {
     findSeatsNoAvailableByTravel(idTravel: number): Promise<TicketModel[]>;
     isDateValidForSale(date: Date): boolean;
     findTicketBySeat(numberSeat: number, idTravel: number): Promise<TicketModel>;
+    findTickets(ticketSearch: TicketSearch, pageNumber: number, pageSize: number): Promise<TicketPage>
 }

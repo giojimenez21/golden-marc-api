@@ -1,16 +1,18 @@
+import dayjs from "dayjs";
 import { Op } from "sequelize";
-import { calculateOffset, calculatePagination } from "../common/helpers/calculatePagination";
-import { ErrorAndCode } from "../common/utilities/ErrorAndCode";
-import { IManagmentService } from "./interface/IManagmentService";
-import { OfficePage } from "./interface/OfficePage";
+import { logger } from "../common";
 import { PlacePage } from "./interface/PlacePage";
-import { Office, OfficeModel } from "./models/Office.model";
+import { OfficePage } from "./interface/OfficePage";
+import { TravelPage } from "./interface/TravelPage";
 import { Place, PlaceModel } from "./models/Place.model";
 import { Travel, TravelModel } from "./models/Travel.model";
-import { logger } from "../common";
+import { Office, OfficeModel } from "./models/Office.model";
 import { Ticket, TicketModel } from "./models/Ticket.model";
-import { TravelPage } from "./interface/TravelPage";
-import dayjs from "dayjs";
+import { ErrorAndCode } from "../common/utilities/ErrorAndCode";
+import { IManagmentService } from "./interface/IManagmentService";
+import { calculateOffset, calculatePagination } from "../common/helpers/calculatePagination";
+import { TicketPage } from "./interface/TicketPage";
+import { TicketSearch } from "./interface/TicketSearch";
 
 export class ManagmentService implements IManagmentService {
     async findAllOffice(pageNumber: number, pageSize: number): Promise<OfficePage> {
@@ -85,23 +87,23 @@ export class ManagmentService implements IManagmentService {
     }
 
 
-    async findPlace(id: number = 0, name: string = ""): Promise<PlaceModel> {
-        let placeFind;
-        if(id > 0) {
-            placeFind = await Place.findOne({
-                where: { id }
-            });
+    async findPlace(id: number, name: string): Promise<PlaceModel> {
+        const whereClause:any = {};
+        if (id) {
+            whereClause.id = id
         }
-
-        if(name !== "") {
-            placeFind = await Place.findOne({
-                where: {
-                    name: { [Op.substring]: name }
-                }
-            });
-        } 
-
-        return placeFind?.toJSON() as PlaceModel;
+    
+        if (name) {
+            whereClause.name = name
+        }
+    
+        const placeFound = await Place.findOne({
+            where: {
+                [Op.or]: whereClause
+            }
+        })
+        
+        return placeFound?.toJSON() as PlaceModel;
     }
 
     async createTravel(travel: TravelModel): Promise<TravelModel> {
@@ -142,8 +144,20 @@ export class ManagmentService implements IManagmentService {
             where: { key_ticket: keyTicket },
             include: [
                 { model: Office },
-                { model: Travel }
-            ]
+                {
+                    model: Travel,
+                    include: [
+                        {
+                            model: Place,
+                            as: "places_start"
+                        },
+                        {
+                            model: Place,
+                            as: "places_end"
+                        }
+                    ],
+                },
+            ],
         });
 
         return ticket?.toJSON() as TicketModel;
@@ -211,5 +225,36 @@ export class ManagmentService implements IManagmentService {
         });
 
         return seat?.toJSON() as TicketModel;
+    }
+
+    async findTickets(ticketSearch: TicketSearch, pageNumber: number, pageSize: number): Promise<TicketPage> {
+        const offset = calculateOffset(pageNumber, pageSize);
+        const whereClause:any = {};
+
+        if (ticketSearch.placeStartId) {
+            whereClause.places_start_id = ticketSearch.placeStartId;
+        }
+    
+        if (ticketSearch.placeEndId) {
+            whereClause.places_end_id = ticketSearch.placeEndId;
+        }
+    
+        if (ticketSearch.date) {
+            whereClause.date = ticketSearch.date;
+        }
+
+        const tickets = await Ticket.findAndCountAll({
+            offset,
+            limit: pageSize,
+            where: {
+                [Op.or]: whereClause
+            }
+        });
+        const pagination = calculatePagination(pageNumber, pageSize, tickets.count);
+        const ticketsWithPagination: TicketPage = {
+            ...pagination,
+            tickets: tickets.rows.map(ticket  => ticket.toJSON())
+        }
+        return ticketsWithPagination;
     }
 }
