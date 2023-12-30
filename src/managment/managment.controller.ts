@@ -4,6 +4,7 @@ import { logger } from "../common";
 import { ErrorAndCode } from "../common/utilities/ErrorAndCode";
 import { PageDefaults } from "../common/interface/PageDefaults.enum";
 import dayjs from "dayjs";
+import { TicketSearch } from "./interface/TicketSearch";
 
 export class ManagmentController  {
     constructor(private readonly managmentService: IManagmentService) {}
@@ -172,6 +173,38 @@ export class ManagmentController  {
                 return res.status(204).json(travelPage);
             }
             return res.status(200).json(travelPage);
+        } catch (e: any) {
+            logger.error(e.stack);
+            if (e instanceof ErrorAndCode) {
+                return res.status(e.statusCode).json({ error: e.message });
+            }
+            return res.status(500).json({ error: e.message });
+        }
+    }
+
+    public findTickets = async(req:Request, res: Response) => {
+        const { keyTicket, date, nameClient, placeStartId, placeEndId } = req.query!;
+        const pageNumber = +req.query.page! || PageDefaults.pageNumber;
+        const pageSize = +req.query.size! || PageDefaults.pageSize;
+        const ticketSearch:TicketSearch = {
+            keyTicket: keyTicket?.toString()!,
+            date: date?.toString()!,
+            nameClient: nameClient?.toString()!,
+            placeStartId: +placeStartId!,
+            placeEndId: +placeEndId!
+        };
+        try {
+            const ticketPage = await this.managmentService.findTickets(
+                ticketSearch, 
+                pageNumber, 
+                pageSize
+            );
+
+            if(ticketPage.tickets.length == 0) {
+                return res.status(204).json(ticketPage);
+            }
+            
+            return res.status(200).json(ticketPage);
         } catch (e: any) {
             logger.error(e.stack);
             if (e instanceof ErrorAndCode) {

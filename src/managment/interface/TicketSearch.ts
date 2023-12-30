@@ -1,6 +1,6 @@
 export interface TicketSearch {
     keyTicket: string;
-    date: Date;
+    date: string;
     nameClient: string;
     placeStartId: number;
     placeEndId: number;

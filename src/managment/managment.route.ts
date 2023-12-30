@@ -69,3 +69,8 @@ managmentRoute.get(
     "/find-ticket/:keyTicket",
     managmentController.findTicket
 );
+
+managmentRoute.get(
+    "/find-tickets",
+    managmentController.findTickets
+);

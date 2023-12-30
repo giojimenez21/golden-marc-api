@@ -528,6 +528,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /managment/find-tickets:
+    get:
+      tags: 
+        - Gestion 
+      summary: Busca los tickets por distintos parametros, no son obligatorios todos.
+      security:
+        - bearerAuth: []
+      parameters: 
+        - in: query
+          name: nameClient 
+          schema: 
+            type: string 
+          description: Nombre del cliente
+        - in: query
+          name: placeStartId 
+          schema: 
+            type: number 
+          description: Id de lugar de inicio
+        - in: query
+          name: placeEndId
+          schema: 
+            type: string 
+          description: Id del lugar de destino
+        - in: query
+          name: date
+          schema: 
+            type: string 
+          description: Fecha de inicio del viaje en formato "yyyy-mm-dd"
+        - in: query
+          name: page
+          schema: 
+            type: string 
+          description: Numero de la pagina del resultado, por default es 1
+        - in: query
+          name: size
+          schema: 
+            type: string 
+          description: Numero de elementos a mostrar por pagina, el default es el que fue especificado en el .env
+      responses:
+        '200':
+          description: Retorna el listado de viajes que coinciden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TravelPage'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     UserWithToken:
