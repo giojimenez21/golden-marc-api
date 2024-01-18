@@ -36,16 +36,23 @@ export class SocketController {
         const travel = await this.managmentService.findTravelById(ticket.travels_id);
 
         if (this.managmentService.isDateValidForSale(travel.date)) {
-            socket.emit("create-ticket", { error: "No puede seleccionar un viaje que ya fue finalizado." });
+            socket.emit(
+                "create-ticket", 
+                { error: "No puede seleccionar un viaje que ya fue finalizado." }
+            );
             return;
         }
         
         if(await this.managmentService.findTicketBySeat(ticket.number_seat, ticket.travels_id)) {
-            socket.emit("create-ticket", { error: "El asiento ya se encuentra ocupado." });
+            socket.emit(
+                "create-ticket", 
+                { error: "El asiento ya se encuentra ocupado." }
+            );
             return;
         }
         const ticketCreated = await this.managmentService.createTicket(ticket);
         const seats = await this.managmentService.findSeatsNoAvailableByTravel(ticket.travels_id);
+        
         socket.emit("create-ticket", ticketCreated);
         socket.emit("occupied-seats-by-travel", seats);
     }

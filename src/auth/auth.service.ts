@@ -65,7 +65,7 @@ export class AuthService implements IAuthService {
         const userExist = await this.findUserByUsername(userLogin.username);
         if (!userExist) {
             throw new ErrorAndCode(
-                404,
+                403,
                 "Verifique las credenciales ingresadas."
             );
         }

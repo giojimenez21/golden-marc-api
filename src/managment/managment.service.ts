@@ -4,18 +4,15 @@ import { logger } from "../common";
 import { PlacePage } from "./interface/PlacePage";
 import { OfficePage } from "./interface/OfficePage";
 import { TravelPage } from "./interface/TravelPage";
+import { TicketPage } from "./interface/TicketPage";
+import { TicketSearch } from "./interface/TicketSearch";
 import { Place, PlaceModel } from "./models/Place.model";
 import { Travel, TravelModel } from "./models/Travel.model";
 import { Office, OfficeModel } from "./models/Office.model";
 import { Ticket, TicketModel } from "./models/Ticket.model";
 import { ErrorAndCode } from "../common/utilities/ErrorAndCode";
 import { IManagmentService } from "./interface/IManagmentService";
-import {
-    calculateOffset,
-    calculatePagination,
-} from "../common/helpers/calculatePagination";
-import { TicketPage } from "./interface/TicketPage";
-import { TicketSearch } from "./interface/TicketSearch";
+import { calculateOffset, calculatePagination } from "../common/helpers/calculatePagination";
 
 export class ManagmentService implements IManagmentService {
     async findAllOffice(
@@ -190,7 +187,6 @@ export class ManagmentService implements IManagmentService {
                 },
             ],
         });
-
         return ticket?.toJSON() as TicketModel;
     }
 
@@ -273,7 +269,6 @@ export class ManagmentService implements IManagmentService {
         pageSize: number
     ): Promise<TicketPage> {
         const offset = calculateOffset(pageNumber, pageSize);
-        const whereClause: any = {};
         const whereClauseWithOr = [];
         if (ticketSearch.placeStartId) {
             whereClauseWithOr.push({
