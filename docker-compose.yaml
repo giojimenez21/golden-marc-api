@@ -1,0 +1,45 @@
+version: "3"
+services:
+    golden-marc-api:
+        depends_on:
+            - golden-marc-db
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: golden-marc-api-docker
+        container_name: golden-marc-api
+        restart: always
+        ports:
+            - "${PORT}:${PORT}"
+        environment:
+            PORT: ${PORT}
+            DB: ${DB}
+            USER_DB: ${USER_DB}
+            PASSWORD_DB: ${PASSWORD_DB}
+            HOST_DB: ${HOST_DB}
+            PORT_DB: ${PORT_DB}
+            SECRET_JWT: ${SECRET_JWT}
+            EXPIRE_JWT: ${EXPIRE_JWT}
+            PAGE_SIZE: ${PAGE_SIZE}
+    golden-marc-db:
+        image: mysql:5.7
+        container_name: golden-marc-db
+        restart: always
+        volumes:
+            - ./mysql-dump:/docker-entrypoint-initdb.d
+            - ./db-data:/var/lib/mysql
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_ROOT_PASSWORD: ${PASSWORD_DB}
+        ports:
+            - 3306:3306
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        environment:
+            PMA_HOST: golden-marc-db
+            PMA_PORT: 3306
+        ports:
+            - 8080:80
+        depends_on:
+            - golden-marc-db
