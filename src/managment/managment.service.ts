@@ -112,7 +112,7 @@ export class ManagmentService implements IManagmentService {
         const offset = calculateOffset(pageNumber, pageSize);
         const places = await Place.findAndCountAll({
             offset,
-            limit: pageSize,
+            limit: pageSize
         });
         const placesJson = places.rows.map((place) => place.toJSON());
         const pagination = calculatePagination(

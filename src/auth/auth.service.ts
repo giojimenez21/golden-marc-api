@@ -10,7 +10,7 @@ export class AuthService implements IAuthService {
     async createUser(user: UserModel): Promise<UserWithToken> {
         const userExist = await this.findUserByUsername(user.username);
         if (userExist) {
-            throw new Error("Ya hay una persona con ese usuario.");
+            throw new ErrorAndCode(401, "Ya hay una persona con ese usuario.");
         }
         const salt = bcrypt.genSaltSync();
         const passwordHash = bcrypt.hashSync(user.password!, salt);
@@ -18,12 +18,12 @@ export class AuthService implements IAuthService {
             ...user,
             password: passwordHash,
         });
-        const token = await this.generateToken(userCreated.toJSON());
-        const { password, ...userWithOutPassword } = userCreated.toJSON();
-        const userWithToken: UserWithToken = {
-            ...userWithOutPassword,
-            token,
-        };
+        const userNew = await User.findOne({
+            attributes: { exclude: ["password"] },
+            where: { id: userCreated.toJSON().id }
+        });
+        const token = await this.generateToken(userNew?.toJSON()!);
+        const userWithToken: UserWithToken = { ...userNew?.toJSON()!, token };
         return userWithToken;
     }
 
