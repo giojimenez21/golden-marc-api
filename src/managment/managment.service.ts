@@ -15,10 +15,7 @@ import { IManagmentService } from "./interface/IManagmentService";
 import { calculateOffset, calculatePagination } from "../common/helpers/calculatePagination";
 
 export class ManagmentService implements IManagmentService {
-    async findAllOffice(
-        pageNumber: number,
-        pageSize: number
-    ): Promise<OfficePage> {
+    async findAllOffice(pageNumber: number, pageSize: number): Promise<OfficePage> {
         const offset = calculateOffset(pageNumber, pageSize);
         const offices = await Office.findAndCountAll({
             offset,
@@ -37,11 +34,36 @@ export class ManagmentService implements IManagmentService {
         return officesWithPagination;
     }
 
-    async findOffice(
-        id: number = 0,
-        keyOffice: string = "",
-        name = ""
-    ): Promise<OfficeModel> {
+    async findAllTravels(pageNumber: number, pageSize: number): Promise<TravelPage> {
+        const offset = calculateOffset(pageNumber, pageSize);
+        const travels = await Travel.findAndCountAll({
+            offset,
+            limit: pageSize,
+            include: [
+                {
+                    model: Place,
+                    as: "places_start",
+                },
+                {
+                    model: Place,
+                    as: "places_end",
+                },
+            ],
+        });
+        const travelsJson = travels.rows.map((office) => office.toJSON());
+        const pagination = calculatePagination(
+            pageNumber,
+            pageSize,
+            travels.count
+        );
+        const travelsWithPagination: TravelPage = {
+            ...pagination,
+            travels: travelsJson,
+        };
+        return travelsWithPagination;
+    }
+
+    async findOffice(id: number = 0, keyOffice: string = "", name = ""): Promise<OfficeModel> {
         let office;
         if (id > 0) {
             office = await Office.findOne({
@@ -86,10 +108,7 @@ export class ManagmentService implements IManagmentService {
         return placeCreated.toJSON();
     }
 
-    async findAllPlaces(
-        pageNumber: number,
-        pageSize: number
-    ): Promise<PlacePage> {
+    async findAllPlaces(pageNumber: number, pageSize: number): Promise<PlacePage> {
         const offset = calculateOffset(pageNumber, pageSize);
         const places = await Place.findAndCountAll({
             offset,
@@ -146,11 +165,7 @@ export class ManagmentService implements IManagmentService {
         return travelNew.toJSON();
     }
 
-    async findTravel(
-        placeStart: number,
-        placeEnd: number,
-        date: Date
-    ): Promise<TravelModel> {
+    async findTravel(placeStart: number, placeEnd: number, date: Date): Promise<TravelModel> {
         const travel = await Travel.findOne({
             where: {
                 places_start_id: placeStart,
@@ -314,7 +329,7 @@ export class ManagmentService implements IManagmentService {
                 },
             ],
             where: whereClauseWithOr.length > 0
-                ? {[Op.or]: whereClauseWithOr}
+                ? { [Op.or]: whereClauseWithOr }
                 : {},
             offset,
             limit: pageSize,

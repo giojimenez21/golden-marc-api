@@ -26,8 +26,23 @@ export class ManagmentController  {
         const pageNumber = +req.query.page! || PageDefaults.pageNumber;
         const pageSize = +req.query.size! || PageDefaults.pageSize;
         try {
-            const officeCreated = await this.managmentService.findAllOffice(pageNumber, pageSize);
-            return res.status(200).json(officeCreated);
+            const offices = await this.managmentService.findAllOffice(pageNumber, pageSize);
+            return res.status(200).json(offices);
+        } catch (e: any) {
+            logger.error(e.stack);
+            if (e instanceof ErrorAndCode) {
+                return res.status(e.statusCode).json({ error: e.message });
+            }
+            return res.status(500).json({ error: e.message });
+        }
+    }
+
+    public findAllTravels = async(req: Request, res: Response) => {
+        const pageNumber = +req.query.page! || PageDefaults.pageNumber;
+        const pageSize = +req.query.size! || PageDefaults.pageSize;
+        try {
+            const travels = await this.managmentService.findAllTravels(pageNumber, pageSize);
+            return res.status(200).json(travels);
         } catch (e: any) {
             logger.error(e.stack);
             if (e instanceof ErrorAndCode) {

@@ -25,4 +25,5 @@ export interface IManagmentService {
     isDateValidForSale(date: Date): boolean;
     findTicketBySeat(numberSeat: number, idTravel: number): Promise<TicketModel>;
     findTickets(ticketSearch: TicketSearch, pageNumber: number, pageSize: number): Promise<TicketPage>
+    findAllTravels(pageNumber: number, pageSize: number): Promise<TravelPage>
 }

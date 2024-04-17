@@ -27,6 +27,11 @@ managmentRoute.get(
 );
 
 managmentRoute.get(
+    "/find-all-travels",
+    managmentController.findAllTravels
+);
+
+managmentRoute.get(
     "/find-office",
     managmentController.findOffice
 );

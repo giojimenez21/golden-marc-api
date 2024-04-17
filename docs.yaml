@@ -202,6 +202,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /managment/find-all-travels:
+    get:
+      tags: 
+        - Gestion 
+      summary: Listar todas los viajes disponibles.
+      security:
+        - bearerAuth: []
+      parameters: 
+        - in: query
+          name: page 
+          schema: 
+            type: number 
+          description: Numero de pagina 
+        - in: query
+          name: size
+          schema: 
+            type: number 
+          description: Tamaño de la pagina
+      responses:
+        '200':
+          description: Listado de viajes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TravelPage'
+        '400':
+          description: Faltaron propiedades en el body, o no se cumplio con alguna regla de validación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '5XX':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /managment/find-office:
     get:
       tags: 
