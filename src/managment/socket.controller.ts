@@ -5,10 +5,7 @@ import { SocketWithUser, verifyTokenSocket } from "../auth/middleware/verifyToke
 import { TicketModel } from "./models/Ticket.model";
 
 export class SocketController {
-    constructor(
-        private readonly io: Server,
-        private readonly managmentService: IManagmentService
-    ) {}
+    constructor(private readonly io: Server, private readonly managmentService: IManagmentService) {}
 
     public init = () => {
         this.io.use((socket, next) => verifyTokenSocket(socket, next));

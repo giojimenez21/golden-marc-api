@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
-import { Op, WhereOptions } from "sequelize";
 import { logger } from "../common";
+import { Op, WhereOptions } from "sequelize";
 import { PlacePage } from "./interface/PlacePage";
 import { OfficePage } from "./interface/OfficePage";
 import { TravelPage } from "./interface/TravelPage";
@@ -63,42 +63,27 @@ export class ManagmentService implements IManagmentService {
         return travelsWithPagination;
     }
 
-    async findOffice(id: number = 0, keyOffice: string = "", name = ""): Promise<OfficeModel> {
+    async findOffice(id: number, keyOffice: string, name: string): Promise<OfficeModel> {
         let office;
-        if (id > 0) {
-            office = await Office.findOne({
-                where: { id },
-            });
-        }
+        const whereClause: any = {}
 
-        if (keyOffice !== "") {
-            office = await Office.findOne({
-                where: { key_office: keyOffice },
-            });
-        }
+        if (id) whereClause.id = id;
+        if (keyOffice) whereClause.key_office = keyOffice;
+        if (name) whereClause.name = name;
 
-        if (name !== "") {
-            office = await Office.findOne({
-                where: {
-                    name: {
-                        [Op.substring]: name,
-                    },
-                },
-            });
-        }
-
+        office = await Office.findOne({
+            where: { [Op.or]: whereClause }
+        });
         return office?.toJSON() as OfficeModel;
     }
 
     async createOffice(office: OfficeModel): Promise<OfficeModel> {
         const officeExist = await this.findOffice(
-            office.id,
+            office.id!,
             office.key_office,
             office.name
         );
-        if (officeExist) {
-            throw new ErrorAndCode(400, "Ya existe una oficina con esos datos");
-        }
+        if (officeExist) throw new ErrorAndCode(400, "Ya existe una oficina con esos datos");
         const newOffice = await Office.create(office);
         return newOffice.toJSON();
     }
@@ -110,16 +95,9 @@ export class ManagmentService implements IManagmentService {
 
     async findAllPlaces(pageNumber: number, pageSize: number): Promise<PlacePage> {
         const offset = calculateOffset(pageNumber, pageSize);
-        const places = await Place.findAndCountAll({
-            offset,
-            limit: pageSize
-        });
+        const places = await Place.findAndCountAll({ offset, limit: pageSize });
         const placesJson = places.rows.map((place) => place.toJSON());
-        const pagination = calculatePagination(
-            pageNumber,
-            pageSize,
-            places.count
-        );
+        const pagination = calculatePagination(pageNumber, pageSize, places.count);
         const placesWithPagination: PlacePage = {
             ...pagination,
             places: placesJson,
@@ -210,13 +188,7 @@ export class ManagmentService implements IManagmentService {
         return newTicket.toJSON();
     }
 
-    async findTravels(
-        placeStart: number | null,
-        placeEnd: number | null,
-        date: string | null,
-        pageNumber: number,
-        pageSize: number
-    ): Promise<TravelPage> {
+    async findTravels(placeStart: number | null, placeEnd: number | null, date: string | null, pageNumber: number, pageSize: number): Promise<TravelPage> {
         const offset = calculateOffset(pageNumber, pageSize);
         const whereClause: WhereOptions<TravelModel> = {};
 
@@ -251,9 +223,7 @@ export class ManagmentService implements IManagmentService {
         return travelsWithPagination;
     }
 
-    async findSeatsNoAvailableByTravel(
-        idTravel: number
-    ): Promise<TicketModel[]> {
+    async findSeatsNoAvailableByTravel(idTravel: number): Promise<TicketModel[]> {
         const seats = await Ticket.findAll({
             attributes: ["number_seat"],
             where: { travels_id: idTravel },
@@ -267,10 +237,7 @@ export class ManagmentService implements IManagmentService {
         return dateOfTravel.isAfter(dayjs());
     }
 
-    async findTicketBySeat(
-        numberSeat: number,
-        idTravel: number
-    ): Promise<TicketModel> {
+    async findTicketBySeat(numberSeat: number, idTravel: number): Promise<TicketModel> {
         const seat = await Ticket.findOne({
             where: { number_seat: numberSeat, travels_id: idTravel },
         });
@@ -278,11 +245,7 @@ export class ManagmentService implements IManagmentService {
         return seat?.toJSON() as TicketModel;
     }
 
-    async findTickets(
-        ticketSearch: TicketSearch,
-        pageNumber: number,
-        pageSize: number
-    ): Promise<TicketPage> {
+    async findTickets(ticketSearch: TicketSearch, pageNumber: number, pageSize: number): Promise<TicketPage> {
         const offset = calculateOffset(pageNumber, pageSize);
         const whereClauseWithOr = [];
         if (ticketSearch.placeStartId) {
